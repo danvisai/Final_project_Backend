@@ -1,11 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Image and Text Input</title>
 </head>
 <body>
-    wow...., we have a backend server!!!
+    <h1>Yay!!!! backend server works.... prof pls gib marks</h1>
+    <form action="/submit" method="post" enctype="multipart/form-data">
+        <label for="text">Enter text:</label><br>
+        <input type="text" id="text" name="text"><br><br>
+        
+        <label for="image">Upload image:</label><br>
+        <input type="file" id="image" name="image"><br><br>
+        
+        <input type="submit" value="Submit">
+    </form>
 </body>
 </html>
