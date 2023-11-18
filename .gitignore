@@ -1,3 +1,3 @@
 *.pth
+folder_to_ignore/venv
 *.md
-venv/
