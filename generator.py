@@ -86,7 +86,7 @@ def generateImage(positive_prompt, negative_prompt, image=None):
         transforms.RandomCrop(512),
     ])
 
-    if image:
+    if image is not None:
         with torch.cuda.amp.autocast(dtype=torch.bfloat16), torch.no_grad():
             shrinkedImage = encode(vqmodel, (transformedImage(image)).unsqueeze(0))
     #image_tensor = effnet_preprocess(image)
@@ -102,8 +102,9 @@ def generateImage(positive_prompt, negative_prompt, image=None):
     # torch.Size([1, 16, 12, 12])
 
 
-    with torch.cuda.amp.autocast(dtype=torch.bfloat16), torch.no_grad():
-        effnetData = effnet((effnet_preprocess(image)).unsqueeze(0))
+    if image is not None:
+        with torch.cuda.amp.autocast(dtype=torch.bfloat16), torch.no_grad():
+            effnetData = effnet((effnet_preprocess(image)).unsqueeze(0))
 
     batch_size = 1
     prior_timesteps = 60
@@ -121,17 +122,17 @@ def generateImage(positive_prompt, negative_prompt, image=None):
         sampled = diffuzz.sample(model, {'c': clip_text_embeddings}, unconditional_inputs={"c": clip_text_embeddings_uncond}, shape=effnet_features_shape,
                                 timesteps=prior_timesteps, cfg=prior_cfg, sampler=prior_sampler, x_init=effnetData,#targetImage=effnetData,
                                 t_start=1.0)[-1]
-        print(sampled)
         
         print(f"Prior Sampling: {time.time() - s}")
         print("sample")
 
-        temperature, cfg, steps =(1.0, 0.6), (2.0, 2.0), 12
+        temperature, cfg, steps =(1.0, 0.6), (2.5, 2.5), 14
         s = time.time()
-        sampled_images_original, intermediate = sample(
-            generator, {'effnet': sampled,'byt5': clip_text_embeddings}, generator_latent_shape, unconditional_inputs = {'effnet': effnet_embeddings_uncond, 'byt5': clip_text_embeddings_uncond},
-            temperature=temperature, cfg=cfg, steps=steps, init_x=shrinkedImage
-        )
+        for i in range(1 if image is None else 10):
+            sampled_images_original, intermediate = sample(
+                generator, {'effnet': sampled,'byt5': clip_text_embeddings}, generator_latent_shape, unconditional_inputs = {'effnet': effnet_embeddings_uncond, 'byt5': clip_text_embeddings_uncond},
+                temperature=temperature, cfg=cfg, steps=steps, init_x=shrinkedImage
+            )
         print(f"Generator Sampling: {time.time() - s}")
 
     sampled = decode(vqmodel, sampled_images_original)
