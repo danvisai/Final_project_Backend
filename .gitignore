@@ -1,3 +1,5 @@
 *.pth
-folder_to_ignore/venv
+venv/*
 *.md
+models/*
+__pycache__/*
