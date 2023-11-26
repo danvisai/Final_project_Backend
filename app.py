@@ -26,18 +26,18 @@ def submit():
 def getImage():
     text_input = request.form['prompt']
     #image_file = request.files['image']
-    data_url = request.values['image']
-    offset = data_url.index(',')
-    img_bytes = base64.b64decode(data_url[offset:])
-    img = BytesIO(img_bytes)
+    # data_url = request.values['image']
+    # offset = data_url.index(',')
+    # img_bytes = base64.b64decode(data_url[offset:])
+    # img = BytesIO(img_bytes)
 
-    data = generateImage(text_input, "low detail, bad quality, blurry" ,img)
+    data = generateImage(text_input, "low detail, bad quality, blurry" )
 
     img = BytesIO()
     data.save(img, format="JPEG")
     # img = Image.open(BytesIO(img_bytes))
     # img.show()
-    return send_file(img, mimetype='image/png') 
+    return send_file(img, mimetype='image/jpeg') 
 
 if __name__ == '__main__':
     app.run(debug=True)
