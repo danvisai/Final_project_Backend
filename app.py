@@ -4,6 +4,7 @@ import re
 from io import BytesIO
 from PIL import Image
 from flask_cors import CORS
+from generator import generateImage
 
 app = Flask(__name__)
 CORS(app)
@@ -29,6 +30,11 @@ def getImage():
     offset = data_url.index(',')
     img_bytes = base64.b64decode(data_url[offset:])
     img = BytesIO(img_bytes)
+
+    data = generateImage(text_input, "low detail, bad quality, blurry" ,img)
+
+    img = BytesIO()
+    data.save(img, format="JPEG")
     # img = Image.open(BytesIO(img_bytes))
     # img.show()
     return send_file(img, mimetype='image/png') 
