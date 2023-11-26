@@ -15,6 +15,13 @@ def submit():
         image_data = image_file.read()
         encoded_image = base64.b64encode(image_data).decode('utf-8')
         return render_template('result.html', text=text_input, image_data=encoded_image)
+@app.route('/getImage', methods=['POST'])
+def getImage():
+    text_input = request.form['text']
+    image_file = request.files['image']
+    image_data = image_file.read()
+    encoded_image = base64.b64encode(image_data).decode('utf-8')
+    return encoded_image
 
 if __name__ == '__main__':
     app.run(debug=True)
