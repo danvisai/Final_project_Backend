@@ -15,7 +15,8 @@ import time
 import requests
 transformers.utils.logging.set_verbosity_error()
 
-device = torch.device("mps" if torch.cuda.is_available() else "cpu")
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 checkpoint_stage_a = "models/vqgan_f4_v1_500k.pt"
 checkpoint_stage_b = "models/model_stage_b.pt"
 checkpoint_stage_c = "models/model_stage_c_ema.pt"
@@ -120,7 +121,7 @@ def generateImage(positive_prompt, negative_prompt, image=None):
     with torch.cuda.amp.autocast(dtype=torch.bfloat16), torch.no_grad():
         s = time.time()
         sampled = diffuzz.sample(model, {'c': clip_text_embeddings}, unconditional_inputs={"c": clip_text_embeddings_uncond}, shape=effnet_features_shape,
-                                timesteps=prior_timesteps, cfg=prior_cfg, sampler=prior_sampler, x_init=effnetData,#targetImage=effnetData,
+                                timesteps=prior_timesteps, cfg=prior_cfg, sampler=prior_sampler, x_init=effnetData if image is not None else None,#targetImage=effnetData,
                                 t_start=1.0)[-1]
         
         print(f"Prior Sampling: {time.time() - s}")
@@ -131,7 +132,7 @@ def generateImage(positive_prompt, negative_prompt, image=None):
         for i in range(1 if image is None else 10):
             sampled_images_original, intermediate = sample(
                 generator, {'effnet': sampled,'byt5': clip_text_embeddings}, generator_latent_shape, unconditional_inputs = {'effnet': effnet_embeddings_uncond, 'byt5': clip_text_embeddings_uncond},
-                temperature=temperature, cfg=cfg, steps=steps, init_x=shrinkedImage
+                temperature=temperature, cfg=cfg, steps=steps, init_x=shrinkedImage if image is not None else None
             )
         print(f"Generator Sampling: {time.time() - s}")
 

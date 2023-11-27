@@ -4,7 +4,8 @@ import re
 from io import BytesIO
 from PIL import Image
 from flask_cors import CORS
-from generator import generateImage
+#from generator import generateImage
+from torchvision import transforms
 
 app = Flask(__name__)
 CORS(app)
@@ -23,21 +24,25 @@ def submit():
         return render_template('result.html', text=text_input, image_data=encoded_image)
     
 @app.route('/getImage', methods=['POST'])
+
 def getImage():
     text_input = request.form['prompt']
-    #image_file = request.files['image']
-    # data_url = request.values['image']
-    # offset = data_url.index(',')
-    # img_bytes = base64.b64decode(data_url[offset:])
-    # img = BytesIO(img_bytes)
+    
+    # Assuming generateImage is a function to create an image based on text_input
+    # data = generateImage(text_input, "low detail, bad quality, blurry")
+    
+    # For testing purposes, opening a sample image file
+    data = Image.open("./input/test.jpeg")
 
-    data = generateImage(text_input, "low detail, bad quality, blurry" )
+    # Saving the image data into BytesIO object
+    img_io = BytesIO()
+    data.save(img_io, format='JPEG')
+    img_io.seek(0)  # Move cursor to the start of the BytesIO stream
+    
+    # Return the image file using Flask's send_file function
+    return send_file(img_io, mimetype='image/jpeg')
 
-    img = BytesIO()
-    data.save(img, format="JPEG")
-    # img = Image.open(BytesIO(img_bytes))
-    # img.show()
-    return send_file(img, mimetype='image/jpeg') 
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
