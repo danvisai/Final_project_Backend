@@ -88,8 +88,8 @@ def generateImage(positive_prompt, negative_prompt, image=None):
     ])
 
     if image is not None:
-        with torch.cuda.amp.autocast(dtype=torch.bfloat16), torch.no_grad():
-            shrinkedImage = encode(vqmodel, (transformedImage(image)).unsqueeze(0))
+        #with torch.cuda.amp.autocast(dtype=torch.bfloat16), torch.no_grad():
+        shrinkedImage = encode(vqmodel, (transformedImage(image)).to(device).unsqueeze(0))
     #image_tensor = effnet_preprocess(image)
 
     #clip_image_model = CLIPModel.from_pretrained("laion/CLIP-ViT-H-14-laion2B-s32B-b79K").to(device)
@@ -105,7 +105,7 @@ def generateImage(positive_prompt, negative_prompt, image=None):
 
     if image is not None:
         with torch.cuda.amp.autocast(dtype=torch.bfloat16), torch.no_grad():
-            effnetData = effnet((effnet_preprocess(image)).unsqueeze(0))
+            effnetData = effnet((effnet_preprocess(image)).to(device).unsqueeze(0))
 
     batch_size = 1
     prior_timesteps = 60

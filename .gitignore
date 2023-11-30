@@ -1,4 +1,5 @@
 *.pth
+venv/
 venv/*
 *.md
 models/*
